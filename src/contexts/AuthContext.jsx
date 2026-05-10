@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
       .from('couple_members')
       .select('couple_id, couples(id, name, created_at, invite_code)')
       .eq('user_id', userId)
-      .single()
+      .maybeSingle()
 
     setCouple(data?.couples ?? null)
     setLoading(false)
