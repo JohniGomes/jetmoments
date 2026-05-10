@@ -27,8 +27,9 @@ export default function CoupleSetup() {
         .from('couples')
         .insert({ name: coupleName, invite_code: code })
         .select()
-        .single()
+        .maybeSingle()
       if (coupleErr) throw coupleErr
+      if (!couple) throw new Error('Não foi possível criar o espaço.')
 
       const { error: memberErr } = await supabase
         .from('couple_members')
@@ -36,7 +37,7 @@ export default function CoupleSetup() {
       if (memberErr) throw memberErr
 
       await fetchCouple(user.id)
-      navigate('/')
+      navigate('/', { replace: true })
     } catch (err) {
       setError('Erro ao criar o espaço: ' + (err.message || ''))
     } finally {
@@ -53,7 +54,7 @@ export default function CoupleSetup() {
         .from('couples')
         .select('id')
         .eq('invite_code', inviteCode.toUpperCase())
-        .single()
+        .maybeSingle()
 
       if (coupleErr || !couple) { setError('Código inválido.'); setLoading(false); return }
 
@@ -64,7 +65,7 @@ export default function CoupleSetup() {
       if (memberErr) throw memberErr
 
       await fetchCouple(user.id)
-      navigate('/')
+      navigate('/', { replace: true })
     } catch (err) {
       setError('Erro ao entrar: ' + (err.message || ''))
     } finally {
