@@ -21,24 +21,17 @@ export default function Layout() {
   const [inviteCode, setInviteCode] = useState(couple?.invite_code || '')
   const [showCode, setShowCode] = useState(false)
 
-  const [debugInfo, setDebugInfo] = useState('')
-
   // Busca o código diretamente do banco como fallback garantido
   useEffect(() => {
     if (couple?.invite_code) { setInviteCode(couple.invite_code); return }
     if (!user) return
     async function loadCode() {
-      const { data: member, error: e1 } = await supabase
-        .from('couple_members').select('couple_id').eq('user_id', user.id).maybeSingle()
-
-      setDebugInfo(`uid:${user.id.slice(0,8)} | member:${JSON.stringify(member)} | err1:${e1?.message || 'ok'}`)
-
+      const { data: members } = await supabase
+        .from('couple_members').select('couple_id').eq('user_id', user.id).limit(1)
+      const member = members?.[0]
       if (!member?.couple_id) return
-      const { data: c, error: e2 } = await supabase
+      const { data: c } = await supabase
         .from('couples').select('id, name, created_at, invite_code').eq('id', member.couple_id).maybeSingle()
-
-      setDebugInfo(prev => prev + ` | couple:${JSON.stringify(c)} | err2:${e2?.message || 'ok'}`)
-
       if (c) { setInviteCode(c.invite_code); setCouple(c) }
     }
     loadCode()
@@ -93,13 +86,6 @@ export default function Layout() {
           </div>
         </div>
       </header>
-
-      {/* DEBUG TEMPORÁRIO — remover depois */}
-      {debugInfo && (
-        <div style={{background:'#1a0a0a',color:'#f72585',fontSize:'10px',padding:'8px 12px',wordBreak:'break-all',zIndex:99,position:'relative'}}>
-          🔍 {debugInfo}
-        </div>
-      )}
 
       {/* Content */}
       <main className="flex-1 relative z-10 pb-32 md:pb-8 md:ml-64 overflow-x-hidden">

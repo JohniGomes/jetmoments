@@ -39,11 +39,12 @@ export function AuthProvider({ children }) {
     if (cached) setLoading(false)
 
     try {
-      const { data: member } = await supabase
+      const { data: members } = await supabase
         .from('couple_members')
         .select('couple_id')
         .eq('user_id', userId)
-        .maybeSingle()
+        .limit(1)
+      const member = members?.[0]
 
       if (!member?.couple_id) {
         setCachedCouple(null)
