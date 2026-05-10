@@ -192,7 +192,7 @@ export default function Gallery() {
                 placeholder='Ex: "Viagem para SP", "Aniversário"...'
                 autoFocus
               />
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-3 mt-8">
                 <button onClick={() => setAlbumModal(false)} className="flex-1 py-3 rounded-2xl text-sm font-semibold text-white/40 hover:text-white hover:bg-white/5 transition border border-white/10">
                   Cancelar
                 </button>
