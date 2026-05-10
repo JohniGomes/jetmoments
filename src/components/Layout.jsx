@@ -57,7 +57,7 @@ export default function Layout() {
 
       {/* Header */}
       <header className="relative z-20 sticky top-0">
-        <div className="glass border-b border-pink-500/10 px-5 py-3.5 flex items-center justify-between">
+        <div className="glass border-b border-pink-500/10 px-5 flex items-center justify-between" style={{paddingTop:'calc(env(safe-area-inset-top) + 10px)', paddingBottom:'10px'}}>
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{background:'linear-gradient(135deg,#f72585,#7209b7)'}}>
               <Heart className="w-4 h-4 text-white fill-white" />
@@ -88,32 +88,33 @@ export default function Layout() {
       </header>
 
       {/* Content */}
-      <main className="flex-1 relative z-10 pb-32 md:pb-8 md:ml-64 overflow-x-hidden">
+      <main className="flex-1 relative z-10 md:pb-8 md:ml-64 overflow-x-hidden" style={{paddingBottom:'calc(env(safe-area-inset-bottom) + 90px)'}}>
         <Outlet />
       </main>
 
       {/* Bottom nav — mobile */}
       <nav className="fixed bottom-0 left-0 right-0 z-20 md:hidden">
-        <div className="glass border-t border-pink-500/10 px-2 py-2 flex items-center justify-around">
+        <div className="glass border-t border-pink-500/10 flex items-center justify-around" style={{paddingTop:'10px', paddingBottom:'calc(env(safe-area-inset-bottom) + 10px)', paddingLeft:'4px', paddingRight:'4px'}}>
           {navItems.map(({ to, icon: Icon, label, end }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all text-[10px] font-semibold ${
+                `flex flex-col items-center gap-1 rounded-xl transition-all text-[10px] font-semibold ${
                   isActive
                     ? 'text-pink-400'
                     : 'text-white/30 hover:text-white/60'
                 }`
               }
+              style={{flex: 1, padding: '4px 2px'}}
             >
               {({ isActive }) => (
                 <>
-                  <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-pink-500/20' : ''}`}>
-                    <Icon className={`w-4 h-4 ${isActive ? 'drop-shadow-[0_0_6px_rgba(247,37,133,0.8)]' : ''}`} />
+                  <div className={`p-2 rounded-xl transition-all ${isActive ? 'bg-pink-500/20' : ''}`}>
+                    <Icon className={`w-5 h-5 ${isActive ? 'drop-shadow-[0_0_6px_rgba(247,37,133,0.8)]' : ''}`} />
                   </div>
-                  <span>{label}</span>
+                  <span style={{fontSize:'9px'}}>{label}</span>
                 </>
               )}
             </NavLink>
