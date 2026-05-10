@@ -94,7 +94,7 @@ export default function Layout() {
 
       {/* Bottom nav — mobile */}
       <nav className="fixed bottom-0 left-0 right-0 z-20 md:hidden">
-        <div className="glass border-t border-pink-500/10 flex items-center justify-around" style={{paddingTop:'10px', paddingBottom:'calc(env(safe-area-inset-bottom) + 10px)', paddingLeft:'4px', paddingRight:'4px'}}>
+        <div className="glass border-t border-pink-500/10 flex items-center justify-around" style={{paddingTop:'10px', paddingBottom:'10px', paddingLeft:'4px', paddingRight:'4px'}}>
           {navItems.map(({ to, icon: Icon, label, end }) => (
             <NavLink
               key={to}
