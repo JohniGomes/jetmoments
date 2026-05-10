@@ -84,7 +84,14 @@ export default function Login() {
       setCouple(coupleData)
       navigate('/', { replace: true })
     } catch (err) {
-      setError(err.message || 'Erro ao entrar com convite.')
+      const msg = err.message || ''
+      if (msg.includes('20 seconds') || msg.includes('rate') || msg.includes('security purposes')) {
+        setError('Aguarde alguns segundos e tente novamente.')
+      } else if (msg.includes('already registered') || msg.includes('already been registered')) {
+        setError('Este email já possui uma conta. Use a aba Entrar.')
+      } else {
+        setError(msg || 'Erro ao entrar com convite.')
+      }
     } finally {
       setLoading(false)
     }
