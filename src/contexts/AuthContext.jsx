@@ -38,17 +38,31 @@ export function AuthProvider({ children }) {
 
   async function fetchCouple(userId) {
     try {
-      const { data, error } = await supabase
+      // Passo 1: busca o couple_id do usuário
+      const { data: member, error: memberError } = await supabase
         .from('couple_members')
-        .select('couple_id, couples(id, name, created_at, invite_code)')
+        .select('couple_id')
         .eq('user_id', userId)
         .maybeSingle()
 
-      if (error) throw error
-      setCouple(data?.couples ?? null)
+      if (memberError) throw memberError
+      if (!member?.couple_id) {
+        setCouple(null)
+        setLoading(false)
+        return
+      }
+
+      // Passo 2: busca os dados do casal diretamente
+      const { data: coupleData, error: coupleError } = await supabase
+        .from('couples')
+        .select('id, name, created_at, invite_code')
+        .eq('id', member.couple_id)
+        .maybeSingle()
+
+      if (coupleError) throw coupleError
+      setCouple(coupleData ?? null)
     } catch {
-      // Em caso de erro (ex: JWT expirado), mantém o estado atual
-      // TOKEN_REFRESHED vai disparar em seguida e tentar novamente
+      // Erro de rede ou JWT expirado — TOKEN_REFRESHED vai retentar
     } finally {
       setLoading(false)
     }
