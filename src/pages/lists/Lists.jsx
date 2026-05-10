@@ -157,8 +157,8 @@ export default function Lists() {
 
       {/* Modal nova lista */}
       {modal && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-4">
-          <div className="glass-strong rounded-3xl w-full max-w-md" style={{padding: '1.5rem 1.25rem'}}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
+          <div className="glass-strong modal-scroll rounded-3xl w-full max-w-md" style={{padding: '1.5rem 1.25rem'}}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-black gradient-text text-lg">Nova lista</h2>
               <button onClick={() => setModal(false)} className="p-2 text-white/30 hover:text-white rounded-xl hover:bg-white/5 transition"><X className="w-4 h-4" /></button>
@@ -188,8 +188,8 @@ export default function Lists() {
 
       {/* Modal adicionar item */}
       {itemModal && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-4">
-          <div className="glass-strong rounded-3xl w-full max-w-md" style={{padding: '1.5rem 1.25rem'}}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
+          <div className="glass-strong modal-scroll rounded-3xl w-full max-w-md" style={{padding: '1.5rem 1.25rem'}}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-black gradient-text text-lg">Novo item</h2>
               <button onClick={() => setItemModal(null)} className="p-2 text-white/30 hover:text-white rounded-xl hover:bg-white/5 transition"><X className="w-4 h-4" /></button>

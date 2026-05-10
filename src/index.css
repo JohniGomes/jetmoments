@@ -51,6 +51,17 @@ body {
   border: 1px solid rgba(247, 37, 133, 0.25);
 }
 
+/* Garante respiração mínima em todos os modais */
+.glass-strong > * {
+  position: relative;
+}
+
+/* Modais sempre com scroll se necessário */
+.modal-scroll {
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
 /* Neon glow effects */
 .neon-text {
   color: #f72585;
