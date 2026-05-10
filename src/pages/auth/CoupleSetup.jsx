@@ -9,7 +9,7 @@ function generateInviteCode() {
 }
 
 export default function CoupleSetup() {
-  const { user, fetchCouple } = useAuth()
+  const { user, setCouple } = useAuth()
   const navigate = useNavigate()
   const [tab, setTab] = useState('create')
   const [coupleName, setCoupleName] = useState('')
@@ -36,7 +36,7 @@ export default function CoupleSetup() {
         .insert({ couple_id: couple.id, user_id: user.id })
       if (memberErr) throw memberErr
 
-      await fetchCouple(user.id)
+      setCouple(couple)
       navigate('/', { replace: true })
     } catch (err) {
       setError('Erro ao criar o espaço: ' + (err.message || ''))
@@ -64,7 +64,13 @@ export default function CoupleSetup() {
       const { error: memberErr } = await supabase.from('couple_members').insert({ couple_id: couple.id, user_id: user.id })
       if (memberErr) throw memberErr
 
-      await fetchCouple(user.id)
+      const { data: coupleData } = await supabase
+        .from('couples')
+        .select('id, name, created_at, invite_code')
+        .eq('id', couple.id)
+        .maybeSingle()
+
+      setCouple(coupleData)
       navigate('/', { replace: true })
     } catch (err) {
       setError('Erro ao entrar: ' + (err.message || ''))
