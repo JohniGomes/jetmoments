@@ -66,12 +66,23 @@ export default function Places() {
       </div>
 
       {/* Filtros */}
-      <div className="flex gap-2 mb-6">
+      <div className="glass rounded-2xl border border-white/5 flex p-1 gap-1 mb-6">
         {[['all','Todos'],['pending','Quero ir'],['visited','Visitados']].map(([val, label]) => (
           <button
             key={val}
             onClick={() => setFilter(val)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filter === val ? 'btn-neon' : 'glass border border-white/10 text-white/40 hover:text-white/70'}`}
+            style={{
+              flex: 1,
+              padding: '8px 12px',
+              borderRadius: '10px',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              whiteSpace: 'nowrap',
+              transition: 'all 0.2s ease',
+              ...(filter === val
+                ? { background: 'linear-gradient(135deg,#f72585,#b5179e)', color: 'white', boxShadow: '0 0 12px rgba(247,37,133,0.35)' }
+                : { background: 'transparent', color: 'rgba(255,255,255,0.35)' })
+            }}
           >
             {label}
           </button>
