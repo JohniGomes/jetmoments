@@ -11,16 +11,41 @@ function generateInviteCode() {
 export default function CoupleSetup() {
   const { user, couple, setCouple } = useAuth()
   const navigate = useNavigate()
-
-  // Se já tem espaço, vai pro dashboard imediatamente
-  useEffect(() => {
-    if (couple) navigate('/', { replace: true })
-  }, [couple])
   const [tab, setTab] = useState('create')
   const [coupleName, setCoupleName] = useState('')
   const [inviteCode, setInviteCode] = useState('')
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Verifica diretamente no banco se já existe casal para este usuário
+    async function checkCouple() {
+      if (!user) { setLoading(false); return }
+
+      const { data: member } = await supabase
+        .from('couple_members')
+        .select('couple_id')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (member?.couple_id) {
+        const { data: coupleData } = await supabase
+          .from('couples')
+          .select('id, name, created_at, invite_code')
+          .eq('id', member.couple_id)
+          .maybeSingle()
+
+        if (coupleData) {
+          setCouple(coupleData)
+          navigate('/', { replace: true })
+          return
+        }
+      }
+      setLoading(false)
+    }
+
+    checkCouple()
+  }, [user])
 
   async function handleCreate(e) {
     e.preventDefault()
@@ -83,6 +108,15 @@ export default function CoupleSetup() {
       setLoading(false)
     }
   }
+
+  if (loading) return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[#07060f]">
+      <div className="w-12 h-12 rounded-2xl flex items-center justify-center animate-pulse-neon" style={{background:'linear-gradient(135deg,#f72585,#7209b7)'}}>
+        <Heart className="w-6 h-6 text-white fill-white" />
+      </div>
+      <div className="w-6 h-6 border-2 border-pink-500/30 border-t-pink-500 rounded-full animate-spin" />
+    </div>
+  )
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6 py-8 relative overflow-hidden bg-[#07060f]">
