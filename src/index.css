@@ -108,6 +108,7 @@ body {
   border: 1px solid rgba(247, 37, 133, 0.2);
   color: #e2e0f0;
   transition: all 0.3s ease;
+  padding: 12px 16px;
 }
 .input-cyber::placeholder {
   color: rgba(226, 224, 240, 0.3);
@@ -151,6 +152,40 @@ body {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+/* Botão de ação de header — cresce com o conteúdo, nunca transborda */
+.btn-header {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: fit-content;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #f72585, #b5179e);
+  color: white;
+  transition: all 0.3s ease;
+  position: relative;
+  box-sizing: border-box;
+}
+.btn-header:hover {
+  box-shadow: 0 0 20px rgba(247, 37, 133, 0.5);
+  transform: translateY(-1px);
+}
+.btn-header:active {
+  transform: translateY(0);
+}
+.btn-header:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Pulse animation */

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
-import { Plus, Music2, Trash2, X, Loader2, Link } from 'lucide-react'
+import { Plus, Music2, Trash2, X, Loader2 } from 'lucide-react'
 
 function getEmbedData(url) {
   try {
@@ -168,19 +168,18 @@ export default function Music() {
                 type="text"
                 value={form.title}
                 onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                className="input-cyber w-full rounded-xl px-4 py-3 text-sm"
+                className="input-cyber w-full rounded-xl text-sm"
+                style={{ padding: '12px 16px' }}
                 placeholder='Nome da música ou playlist *'
               />
-              <div className="relative">
-                <input
-                  type="url"
-                  value={form.url}
-                  onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
-                  className="input-cyber w-full rounded-xl px-4 py-3 pl-10 text-sm"
-                  placeholder="Link do Spotify ou YouTube *"
-                />
-                <Link className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-              </div>
+              <input
+                type="url"
+                value={form.url}
+                onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
+                className="input-cyber w-full rounded-xl text-sm"
+                style={{ padding: '12px 16px' }}
+                placeholder="Link do Spotify ou YouTube *"
+              />
 
               {/* Dica */}
               <div className="flex gap-3 text-[11px] text-white/25">
