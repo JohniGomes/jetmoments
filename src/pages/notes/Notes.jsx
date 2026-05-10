@@ -61,7 +61,7 @@ export default function Notes() {
           <h1 className="text-2xl font-black gradient-text">Notas & Diário</h1>
           <p className="text-white/30 text-sm mt-1">{notes.length} {notes.length === 1 ? 'nota' : 'notas'}</p>
         </div>
-        <button onClick={() => setModal(true)} className="btn-neon flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap">
+        <button onClick={() => setModal(true)} className="btn-header">
           <Plus className="w-4 h-4" /> Nova nota
         </button>
       </div>

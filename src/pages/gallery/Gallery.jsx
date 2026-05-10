@@ -119,7 +119,7 @@ export default function Gallery() {
           </div>
           <button
             onClick={() => setAlbumModal(true)}
-            className="btn-neon flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap"
+            className="btn-header"
           >
             <Plus className="w-4 h-4" /> Novo álbum
           </button>
