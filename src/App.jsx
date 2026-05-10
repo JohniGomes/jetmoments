@@ -3,8 +3,6 @@ import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 import Login from './pages/auth/Login'
-import Register from './pages/auth/Register'
-import CoupleSetup from './pages/auth/CoupleSetup'
 import Dashboard from './pages/Dashboard'
 import Gallery from './pages/gallery/Gallery'
 import Notes from './pages/notes/Notes'
@@ -19,15 +17,6 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/couple-setup"
-            element={
-              <ProtectedRoute requireCouple={false}>
-                <CoupleSetup />
-              </ProtectedRoute>
-            }
-          />
           <Route
             element={
               <ProtectedRoute>

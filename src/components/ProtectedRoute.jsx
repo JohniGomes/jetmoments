@@ -2,8 +2,8 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Heart } from 'lucide-react'
 
-export default function ProtectedRoute({ children, requireCouple = true }) {
-  const { user, couple, loading } = useAuth()
+export default function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth()
 
   if (loading) {
     return (
@@ -17,8 +17,6 @@ export default function ProtectedRoute({ children, requireCouple = true }) {
   }
 
   if (!user) return <Navigate to="/login" replace />
-  if (!requireCouple && couple) return <Navigate to="/" replace />
-  if (requireCouple && !couple) return <Navigate to="/couple-setup" replace />
 
   return children
 }
