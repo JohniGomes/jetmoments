@@ -9,28 +9,41 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Carrega sessão existente imediatamente (lê do localStorage)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser(session.user)
+        fetchCouple(session.user.id)
+      } else {
+        setLoading(false)
+      }
+    })
+
+    // Só reage a login/logout reais — ignora INITIAL_SESSION e TOKEN_REFRESHED
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session?.user) {
+      if (event === 'SIGNED_IN') {
+        setUser(session.user)
+        fetchCouple(session.user.id)
+      } else if (event === 'SIGNED_OUT') {
         setUser(null)
         setCouple(null)
         setLoading(false)
-        return
       }
-      setUser(session.user)
-      fetchCouple(session.user.id)
     })
 
     return () => subscription.unsubscribe()
   }, [])
 
   async function fetchCouple(userId) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('couple_members')
       .select('couple_id, couples(id, name, created_at, invite_code)')
       .eq('user_id', userId)
       .maybeSingle()
 
-    setCouple(data?.couples ?? null)
+    if (!error) {
+      setCouple(data?.couples ?? null)
+    }
     setLoading(false)
   }
 
