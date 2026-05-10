@@ -155,15 +155,15 @@ export default function Music() {
       {/* Modal */}
       {modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
-          <div className="glass-strong modal-scroll rounded-3xl w-full max-w-md" style={{padding: '1.5rem 1.25rem'}}>
-            <div className="flex items-center justify-between mb-5">
+          <div className="glass-strong modal-scroll rounded-3xl w-full max-w-md" style={{padding: '1.75rem 1.5rem'}}>
+            <div className="flex items-center justify-between mb-6">
               <h2 className="font-black gradient-text text-lg">Adicionar música</h2>
               <button onClick={() => { setModal(false); setError('') }} className="p-2 text-white/30 hover:text-white rounded-xl hover:bg-white/5 transition">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <input
                 type="text"
                 value={form.title}
@@ -194,7 +194,7 @@ export default function Music() {
               )}
             </div>
 
-            <div className="flex gap-3 mt-5">
+            <div className="flex gap-3 mt-6">
               <button onClick={() => { setModal(false); setError('') }} className="flex-1 py-3 rounded-2xl text-sm font-semibold text-white/40 hover:text-white hover:bg-white/5 transition border border-white/10">
                 Cancelar
               </button>

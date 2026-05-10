@@ -134,20 +134,20 @@ export default function Places() {
       {/* Modal */}
       {modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
-          <div className="glass-strong modal-scroll rounded-3xl w-full max-w-md" style={{padding: '1.5rem 1.25rem'}}>
-            <div className="flex items-center justify-between mb-5">
+          <div className="glass-strong modal-scroll rounded-3xl w-full max-w-md" style={{padding: '1.75rem 1.5rem'}}>
+            <div className="flex items-center justify-between mb-6">
               <h2 className="font-black gradient-text text-lg">Novo lugar</h2>
               <button onClick={() => setModal(false)} className="p-2 text-white/30 hover:text-white rounded-xl hover:bg-white/5 transition"><X className="w-4 h-4" /></button>
             </div>
-            <div className="space-y-3">
-              <input type="text" value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} className="input-cyber w-full rounded-xl px-4 py-3 text-sm" placeholder="Nome do lugar *" />
-              <input type="text" value={form.city} onChange={e => setForm(f => ({...f, city: e.target.value}))} className="input-cyber w-full rounded-xl px-4 py-3 text-sm" placeholder="Cidade / País" />
-              <input type="url" value={form.maps_url} onChange={e => setForm(f => ({...f, maps_url: e.target.value}))} className="input-cyber w-full rounded-xl px-4 py-3 text-sm" placeholder="Link do Google Maps (opcional)" />
-              <select value={form.category} onChange={e => setForm(f => ({...f, category: e.target.value}))} className="input-cyber w-full rounded-xl px-4 py-3 text-sm">
+            <div className="space-y-4">
+              <input type="text" value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} className="input-cyber w-full rounded-xl text-sm" placeholder="Nome do lugar *" />
+              <input type="text" value={form.city} onChange={e => setForm(f => ({...f, city: e.target.value}))} className="input-cyber w-full rounded-xl text-sm" placeholder="Cidade / País" />
+              <input type="url" value={form.maps_url} onChange={e => setForm(f => ({...f, maps_url: e.target.value}))} className="input-cyber w-full rounded-xl text-sm" placeholder="Link do Google Maps (opcional)" />
+              <select value={form.category} onChange={e => setForm(f => ({...f, category: e.target.value}))} className="input-cyber w-full rounded-xl text-sm" style={{padding: '12px 16px'}}>
                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
-              <textarea value={form.notes} onChange={e => setForm(f => ({...f, notes: e.target.value}))} className="input-cyber w-full rounded-xl px-4 py-3 text-sm resize-none" placeholder="Observações..." rows={2} />
-              <label className="flex items-center gap-3 cursor-pointer">
+              <textarea value={form.notes} onChange={e => setForm(f => ({...f, notes: e.target.value}))} className="input-cyber w-full rounded-xl text-sm resize-none" placeholder="Observações..." rows={2} />
+              <label className="flex items-center gap-3 cursor-pointer" style={{marginTop: '0.25rem'}}>
                 <div
                   onClick={() => setForm(f => ({...f, visited: !f.visited}))}
                   className={`w-6 h-6 rounded-lg border flex items-center justify-center transition-all ${form.visited ? 'bg-pink-500 border-pink-500' : 'border-white/20 bg-white/5'}`}
@@ -157,7 +157,7 @@ export default function Places() {
                 <span className="text-sm text-white/50">Já visitamos</span>
               </label>
             </div>
-            <div className="flex gap-3 mt-5">
+            <div className="flex gap-3 mt-6">
               <button onClick={() => setModal(false)} className="flex-1 py-3 rounded-2xl text-sm font-semibold text-white/40 hover:text-white hover:bg-white/5 transition border border-white/10">Cancelar</button>
               <button onClick={handleSave} disabled={saving} className="flex-1 btn-neon py-3 rounded-2xl text-sm font-bold">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Salvar ♡'}

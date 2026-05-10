@@ -116,38 +116,38 @@ export default function Wishlist() {
       {/* Modal */}
       {modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
-          <div className="glass-strong modal-scroll rounded-3xl w-full max-w-md" style={{padding: '1.5rem 1.25rem'}}>
-            <div className="flex items-center justify-between mb-5">
+          <div className="glass-strong modal-scroll rounded-3xl w-full max-w-md" style={{padding: '1.75rem 1.5rem'}}>
+            <div className="flex items-center justify-between mb-6">
               <h2 className="font-black gradient-text text-lg">Novo desejo</h2>
               <button onClick={() => setModal(false)} className="p-2 text-white/30 hover:text-white rounded-xl hover:bg-white/5 transition"><X className="w-4 h-4" /></button>
             </div>
-            <div className="space-y-3">
-              <input type="text" value={form.name} onChange={e => setForm(f=>({...f,name:e.target.value}))} className="input-cyber w-full rounded-xl px-4 py-3 text-sm" placeholder="O que vocês desejam? *" />
-              <input type="url" value={form.link} onChange={e => setForm(f=>({...f,link:e.target.value}))} className="input-cyber w-full rounded-xl px-4 py-3 text-sm" placeholder="Link (opcional)" />
-              <div>
-                <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">Prioridade</p>
+            <div className="space-y-4">
+              <input type="text" value={form.name} onChange={e => setForm(f=>({...f,name:e.target.value}))} className="input-cyber w-full rounded-xl text-sm" placeholder="O que vocês desejam? *" />
+              <input type="url" value={form.link} onChange={e => setForm(f=>({...f,link:e.target.value}))} className="input-cyber w-full rounded-xl text-sm" placeholder="Link (opcional)" />
+              <div style={{marginTop: '1.25rem'}}>
+                <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Prioridade</p>
                 <div className="flex gap-2">
                   {PRIORITIES.map(p => (
                     <button key={p.value} onClick={() => setForm(f=>({...f,priority:p.value}))}
-                      className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all ${form.priority === p.value ? p.color : 'border-white/10 text-white/30 hover:bg-white/5'}`}>
+                      className={`flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all ${form.priority === p.value ? p.color : 'border-white/10 text-white/30 hover:bg-white/5'}`}>
                       {p.label}
                     </button>
                   ))}
                 </div>
               </div>
-              <div>
-                <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">Para quem</p>
+              <div style={{marginTop: '1rem'}}>
+                <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Para quem</p>
                 <div className="flex gap-2">
                   {['ambos','eu','par'].map(who => (
                     <button key={who} onClick={() => setForm(f=>({...f,for_who:who}))}
-                      className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all capitalize ${form.for_who === who ? 'btn-neon border-transparent' : 'border-white/10 text-white/30 hover:bg-white/5'}`}>
+                      className={`flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all capitalize ${form.for_who === who ? 'btn-neon border-transparent' : 'border-white/10 text-white/30 hover:bg-white/5'}`}>
                       {who === 'ambos' ? '👫 Ambos' : who === 'eu' ? '🙋 Eu' : '💑 Par'}
                     </button>
                   ))}
                 </div>
               </div>
             </div>
-            <div className="flex gap-3 mt-5">
+            <div className="flex gap-3 mt-6">
               <button onClick={() => setModal(false)} className="flex-1 py-3 rounded-2xl text-sm font-semibold text-white/40 hover:text-white hover:bg-white/5 transition border border-white/10">Cancelar</button>
               <button onClick={handleSave} disabled={saving} className="flex-1 btn-neon py-3 rounded-2xl text-sm font-bold">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Salvar ♡'}
