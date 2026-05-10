@@ -12,7 +12,7 @@ export default function Notes() {
   const [form, setForm] = useState({ title: '', content: '' })
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => { if (couple) fetchNotes() }, [couple])
+  useEffect(() => { if (couple) fetchNotes(); else setLoading(false) }, [couple])
 
   async function fetchNotes() {
     setLoading(true)

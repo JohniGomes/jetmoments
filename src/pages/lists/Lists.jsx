@@ -16,7 +16,7 @@ export default function Lists() {
   const [itemForm, setItemForm] = useState('')
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => { if (couple) fetchLists() }, [couple])
+  useEffect(() => { if (couple) fetchLists(); else setLoading(false) }, [couple])
 
   async function fetchLists() {
     setLoading(true)

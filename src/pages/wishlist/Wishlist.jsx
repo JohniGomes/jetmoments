@@ -17,7 +17,7 @@ export default function Wishlist() {
   const [form, setForm] = useState({ name: '', link: '', priority: 'media', for_who: 'ambos' })
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => { if (couple) fetchItems() }, [couple])
+  useEffect(() => { if (couple) fetchItems(); else setLoading(false) }, [couple])
 
   async function fetchItems() {
     setLoading(true)

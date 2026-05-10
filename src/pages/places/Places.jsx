@@ -14,7 +14,7 @@ export default function Places() {
   const [form, setForm] = useState({ name: '', category: 'Restaurante', city: '', maps_url: '', visited: false, notes: '' })
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => { if (couple) fetchPlaces() }, [couple])
+  useEffect(() => { if (couple) fetchPlaces(); else setLoading(false) }, [couple])
 
   async function fetchPlaces() {
     setLoading(true)

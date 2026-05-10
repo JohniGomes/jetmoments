@@ -16,7 +16,7 @@ export default function Gallery() {
   const [savingAlbum, setSavingAlbum] = useState(false)
   const inputRef = useRef()
 
-  useEffect(() => { if (couple) fetchAlbums() }, [couple])
+  useEffect(() => { if (couple) fetchAlbums(); else setLoading(false) }, [couple])
 
   async function fetchAlbums() {
     setLoading(true)

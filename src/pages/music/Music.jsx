@@ -40,7 +40,7 @@ export default function Music() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => { if (couple) fetchTracks() }, [couple])
+  useEffect(() => { if (couple) fetchTracks(); else setLoading(false) }, [couple])
 
   async function fetchTracks() {
     setLoading(true)

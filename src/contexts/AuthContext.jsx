@@ -3,77 +3,79 @@ import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext(null)
 
+const COUPLE_KEY = 'jtm_couple'
+
+function getCachedCouple() {
+  try { return JSON.parse(localStorage.getItem(COUPLE_KEY)) } catch { return null }
+}
+function setCachedCouple(data) {
+  if (data) localStorage.setItem(COUPLE_KEY, JSON.stringify(data))
+  else localStorage.removeItem(COUPLE_KEY)
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [couple, setCouple] = useState(null)
+  const [couple, setCouple] = useState(getCachedCouple) // carrega cache instantâneo
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // onAuthStateChange é a única fonte de verdade.
-    // INITIAL_SESSION dispara imediatamente com a sessão atual (ou null).
-    // TOKEN_REFRESHED dispara quando o JWT expira e é renovado.
-    // Em ambos os casos, refazemos o fetchCouple.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
+      if (event === 'SIGNED_OUT' || !session?.user) {
         setUser(null)
         setCouple(null)
+        setCachedCouple(null)
         setLoading(false)
         return
       }
-
-      if (!session?.user) {
-        setUser(null)
-        setCouple(null)
-        setLoading(false)
-        return
-      }
-
-      // INITIAL_SESSION, SIGNED_IN, TOKEN_REFRESHED — todos buscam o casal
       setUser(session.user)
       fetchCouple(session.user.id)
     })
-
     return () => subscription.unsubscribe()
   }, [])
 
   async function fetchCouple(userId) {
+    // Se já tem cache, remove o loading imediatamente
+    const cached = getCachedCouple()
+    if (cached) setLoading(false)
+
     try {
-      // Passo 1: busca o couple_id do usuário
-      const { data: member, error: memberError } = await supabase
+      const { data: member } = await supabase
         .from('couple_members')
         .select('couple_id')
         .eq('user_id', userId)
         .maybeSingle()
 
-      if (memberError) throw memberError
       if (!member?.couple_id) {
+        setCachedCouple(null)
         setCouple(null)
         setLoading(false)
         return
       }
 
-      // Passo 2: busca os dados do casal diretamente
-      const { data: coupleData, error: coupleError } = await supabase
+      const { data: coupleData } = await supabase
         .from('couples')
         .select('id, name, created_at, invite_code')
         .eq('id', member.couple_id)
         .maybeSingle()
 
-      if (coupleError) throw coupleError
-      setCouple(coupleData ?? null)
+      if (coupleData) {
+        setCachedCouple(coupleData)
+        setCouple(coupleData)
+      }
     } catch {
-      // Erro de rede ou JWT expirado — TOKEN_REFRESHED vai retentar
+      // erro de rede — mantém o cache
     } finally {
       setLoading(false)
     }
   }
 
+  function updateCouple(data) {
+    setCachedCouple(data)
+    setCouple(data)
+  }
+
   async function signUp(email, password, name) {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { name } },
-    })
+    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name } } })
     if (error) throw error
     return data
   }
@@ -89,7 +91,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, couple, setCouple, loading, signUp, signIn, signOut, fetchCouple }}>
+    <AuthContext.Provider value={{ user, couple, setCouple: updateCouple, loading, signUp, signIn, signOut, fetchCouple }}>
       {children}
     </AuthContext.Provider>
   )
