@@ -88,7 +88,7 @@ export default function Music() {
         </div>
         <button
           onClick={() => setModal(true)}
-          className="btn-neon flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold whitespace-nowrap"
+          className="btn-neon flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap"
         >
           <Plus className="w-4 h-4" /> Adicionar
         </button>
