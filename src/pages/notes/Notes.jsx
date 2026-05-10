@@ -110,30 +110,30 @@ export default function Notes() {
       {/* Modal nova nota */}
       {modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
-          <div className="glass-strong modal-scroll rounded-3xl w-full max-w-lg" style={{padding: '1.5rem 1.25rem'}}>
-            <div className="flex items-center justify-between mb-5">
+          <div className="glass-strong modal-scroll rounded-3xl w-full max-w-lg" style={{padding: '1.75rem 1.5rem'}}>
+            <div className="flex items-center justify-between mb-6">
               <h2 className="font-black gradient-text text-lg">Nova nota</h2>
               <button onClick={() => setModal(false)} className="p-2 text-white/30 hover:text-white transition rounded-xl hover:bg-white/5">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="space-y-3">
+            <div className="flex flex-col" style={{gap: '1.25rem'}}>
               <input
                 type="text"
                 value={form.title}
                 onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                className="input-cyber w-full rounded-xl px-4 py-3 text-sm font-bold"
+                className="input-cyber w-full rounded-xl text-sm font-bold"
                 placeholder="Título da nota..."
               />
               <textarea
                 value={form.content}
                 onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
-                className="input-cyber w-full rounded-xl px-4 py-3 text-sm resize-none"
+                className="input-cyber w-full rounded-xl text-sm resize-none"
                 placeholder="Escreva aqui sua memória, pensamento ou carta..."
                 rows={6}
               />
             </div>
-            <div className="flex gap-3 mt-5">
+            <div className="flex gap-3 mt-6">
               <button onClick={() => setModal(false)} className="flex-1 py-3 rounded-2xl text-sm font-semibold text-white/40 hover:text-white hover:bg-white/5 transition border border-white/10">
                 Cancelar
               </button>

@@ -163,7 +163,7 @@ export default function Music() {
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="flex flex-col" style={{gap: '1.25rem'}}>
               <input
                 type="text"
                 value={form.title}

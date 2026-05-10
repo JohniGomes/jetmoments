@@ -121,10 +121,10 @@ export default function Wishlist() {
               <h2 className="font-black gradient-text text-lg">Novo desejo</h2>
               <button onClick={() => setModal(false)} className="p-2 text-white/30 hover:text-white rounded-xl hover:bg-white/5 transition"><X className="w-4 h-4" /></button>
             </div>
-            <div className="space-y-4">
+            <div className="flex flex-col" style={{gap: '1.25rem'}}>
               <input type="text" value={form.name} onChange={e => setForm(f=>({...f,name:e.target.value}))} className="input-cyber w-full rounded-xl text-sm" placeholder="O que vocês desejam? *" />
               <input type="url" value={form.link} onChange={e => setForm(f=>({...f,link:e.target.value}))} className="input-cyber w-full rounded-xl text-sm" placeholder="Link (opcional)" />
-              <div style={{marginTop: '1.25rem'}}>
+              <div>
                 <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Prioridade</p>
                 <div className="flex gap-2">
                   {PRIORITIES.map(p => (
@@ -135,7 +135,7 @@ export default function Wishlist() {
                   ))}
                 </div>
               </div>
-              <div style={{marginTop: '1rem'}}>
+              <div>
                 <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Para quem</p>
                 <div className="flex gap-2">
                   {['ambos','eu','par'].map(who => (

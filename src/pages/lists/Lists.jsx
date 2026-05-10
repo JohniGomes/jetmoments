@@ -163,7 +163,7 @@ export default function Lists() {
               <h2 className="font-black gradient-text text-lg">Nova lista</h2>
               <button onClick={() => setModal(false)} className="p-2 text-white/30 hover:text-white rounded-xl hover:bg-white/5 transition"><X className="w-4 h-4" /></button>
             </div>
-            <div className="space-y-5">
+            <div className="flex flex-col" style={{gap: '1.25rem'}}>
               <input type="text" value={form.title} onChange={e => setForm(f => ({...f, title: e.target.value}))} className="input-cyber w-full rounded-xl text-sm" placeholder="Nome da lista *" />
               <div>
                 <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Ícone</p>

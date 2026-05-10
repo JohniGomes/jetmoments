@@ -139,7 +139,7 @@ export default function Places() {
               <h2 className="font-black gradient-text text-lg">Novo lugar</h2>
               <button onClick={() => setModal(false)} className="p-2 text-white/30 hover:text-white rounded-xl hover:bg-white/5 transition"><X className="w-4 h-4" /></button>
             </div>
-            <div className="space-y-4">
+            <div className="flex flex-col" style={{gap: '1.25rem'}}>
               <input type="text" value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} className="input-cyber w-full rounded-xl text-sm" placeholder="Nome do lugar *" />
               <input type="text" value={form.city} onChange={e => setForm(f => ({...f, city: e.target.value}))} className="input-cyber w-full rounded-xl text-sm" placeholder="Cidade / País" />
               <input type="url" value={form.maps_url} onChange={e => setForm(f => ({...f, maps_url: e.target.value}))} className="input-cyber w-full rounded-xl text-sm" placeholder="Link do Google Maps (opcional)" />
@@ -147,7 +147,7 @@ export default function Places() {
                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
               <textarea value={form.notes} onChange={e => setForm(f => ({...f, notes: e.target.value}))} className="input-cyber w-full rounded-xl text-sm resize-none" placeholder="Observações..." rows={2} />
-              <label className="flex items-center gap-3 cursor-pointer" style={{marginTop: '0.25rem'}}>
+              <label className="flex items-center gap-3 cursor-pointer">
                 <div
                   onClick={() => setForm(f => ({...f, visited: !f.visited}))}
                   className={`w-6 h-6 rounded-lg border flex items-center justify-center transition-all ${form.visited ? 'bg-pink-500 border-pink-500' : 'border-white/20 bg-white/5'}`}
