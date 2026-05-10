@@ -141,7 +141,7 @@ export default function Wishlist() {
                   {['ambos','eu','par'].map(who => (
                     <button key={who} onClick={() => setForm(f=>({...f,for_who:who}))}
                       className={`flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all capitalize ${form.for_who === who ? 'btn-neon border-transparent' : 'border-white/10 text-white/30 hover:bg-white/5'}`}>
-                      {who === 'ambos' ? '👫 Ambos' : who === 'eu' ? '🙋 Eu' : '💑 Par'}
+                      {who === 'ambos' ? '👫 Ambos' : who === 'eu' ? '🙋 Johni' : '💑 Thallyta'}
                     </button>
                   ))}
                 </div>
