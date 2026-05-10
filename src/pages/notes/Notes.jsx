@@ -89,7 +89,7 @@ export default function Notes() {
             <div
               key={note.id}
               onClick={() => setSelected(note)}
-              className={`glass rounded-2xl border bg-gradient-to-br ${colors[i % colors.length]} cursor-pointer hover:scale-[1.02] transition-all duration-200 active:scale-95`} style={{ padding: '1.25rem 1.25rem 1.25rem 1.5rem' }}
+              className={`glass rounded-2xl border bg-gradient-to-br ${colors[i % colors.length]} cursor-pointer hover:scale-[1.02] transition-all duration-200 active:scale-95`} style={{ padding: '1.25rem 1rem 1.25rem 1.25rem' }}
             >
               <div className="flex items-start justify-between gap-2 mb-3">
                 <h3 className="font-bold text-white text-sm leading-tight line-clamp-2">{note.title}</h3>
@@ -110,7 +110,7 @@ export default function Notes() {
       {/* Modal nova nota */}
       {modal && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-4">
-          <div className="glass-strong rounded-3xl p-6 w-full max-w-lg">
+          <div className="glass-strong rounded-3xl w-full max-w-lg" style={{padding: '1.5rem 1.25rem'}}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-black gradient-text text-lg">Nova nota</h2>
               <button onClick={() => setModal(false)} className="p-2 text-white/30 hover:text-white transition rounded-xl hover:bg-white/5">

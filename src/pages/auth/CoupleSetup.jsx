@@ -73,7 +73,7 @@ export default function CoupleSetup() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden bg-[#07060f]">
+    <div className="min-h-screen flex items-center justify-center px-6 py-8 relative overflow-hidden bg-[#07060f]">
       <div className="orb w-96 h-96 bg-pink-600/20 top-0 left-0" />
       <div className="orb w-72 h-72 bg-purple-700/20 bottom-0 right-0" />
       <div className="bg-grid absolute inset-0 z-0" />
@@ -89,7 +89,7 @@ export default function CoupleSetup() {
           </p>
         </div>
 
-        <div className="glass-strong rounded-3xl p-8">
+        <div className="glass-strong rounded-3xl" style={{padding: '2rem 1.5rem'}}>
           {/* Tabs */}
           <div className="flex rounded-2xl overflow-hidden p-1 mb-7" style={{background:'rgba(255,255,255,0.05)'}}>
             {[

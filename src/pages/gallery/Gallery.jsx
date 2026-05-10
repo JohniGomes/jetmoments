@@ -176,7 +176,7 @@ export default function Gallery() {
         {/* Modal novo álbum */}
         {albumModal && (
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-4">
-            <div className="glass-strong rounded-3xl p-6 w-full max-w-md">
+            <div className="glass-strong rounded-3xl w-full max-w-md" style={{padding: '1.5rem 1.25rem'}}>
               <div className="flex items-center justify-between mb-5">
                 <h2 className="font-black gradient-text text-lg">Novo álbum</h2>
                 <button onClick={() => setAlbumModal(false)} className="p-2 text-white/30 hover:text-white rounded-xl hover:bg-white/5 transition">

@@ -34,7 +34,7 @@ export default function Register() {
   ]
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden bg-[#07060f]">
+    <div className="min-h-screen flex items-center justify-center px-6 py-8 relative overflow-hidden bg-[#07060f]">
       <div className="orb w-96 h-96 bg-pink-600/20 -top-20 -right-20" />
       <div className="orb w-80 h-80 bg-purple-700/15 bottom-0 left-0" />
       <div className="bg-grid absolute inset-0 z-0" />
@@ -50,7 +50,7 @@ export default function Register() {
           </p>
         </div>
 
-        <div className="glass-strong rounded-3xl p-8">
+        <div className="glass-strong rounded-3xl" style={{padding: '2rem 1.5rem'}}>
           <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-px h-px w-32 bg-gradient-to-r from-transparent via-pink-500 to-transparent" />
           <form onSubmit={handleSubmit} className="space-y-4">
             {fields.map(({ key, label, type, placeholder }) => (

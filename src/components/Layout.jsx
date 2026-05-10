@@ -68,7 +68,7 @@ export default function Layout() {
       </header>
 
       {/* Content */}
-      <main className="flex-1 relative z-10 pb-24 md:pb-8 md:ml-64 overflow-x-hidden">
+      <main className="flex-1 relative z-10 pb-32 md:pb-8 md:ml-64 overflow-x-hidden">
         <Outlet />
       </main>
 
