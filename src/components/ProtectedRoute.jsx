@@ -17,6 +17,7 @@ export default function ProtectedRoute({ children, requireCouple = true }) {
   }
 
   if (!user) return <Navigate to="/login" replace />
+  if (!requireCouple && couple) return <Navigate to="/" replace />
   if (requireCouple && !couple) return <Navigate to="/couple-setup" replace />
 
   return children

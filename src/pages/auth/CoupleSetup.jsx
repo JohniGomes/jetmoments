@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Heart, Link2, Plus, Sparkles } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
@@ -9,8 +9,13 @@ function generateInviteCode() {
 }
 
 export default function CoupleSetup() {
-  const { user, setCouple } = useAuth()
+  const { user, couple, setCouple } = useAuth()
   const navigate = useNavigate()
+
+  // Se já tem espaço, vai pro dashboard imediatamente
+  useEffect(() => {
+    if (couple) navigate('/', { replace: true })
+  }, [couple])
   const [tab, setTab] = useState('create')
   const [coupleName, setCoupleName] = useState('')
   const [inviteCode, setInviteCode] = useState('')

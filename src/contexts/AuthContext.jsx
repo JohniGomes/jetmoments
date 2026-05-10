@@ -9,18 +9,27 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let initialized = false
+
     supabase.auth.getSession().then(({ data: { session } }) => {
+      initialized = true
       setUser(session?.user ?? null)
       if (session?.user) fetchCouple(session.user.id)
       else setLoading(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-      if (session?.user) fetchCouple(session.user.id)
-      else {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setUser(null)
         setCouple(null)
         setLoading(false)
+        return
+      }
+      // Ignora o disparo inicial duplicado; só age em login/logout real
+      if (!initialized) return
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        setUser(session?.user ?? null)
+        if (session?.user) fetchCouple(session.user.id)
       }
     })
 
