@@ -1,7 +1,8 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { Heart, Image, BookOpen, MapPin, Star, List, LogOut, Home, Copy, Check, Music2 } from 'lucide-react'
+import { Heart, Image, BookOpen, MapPin, Star, List, LogOut, Home, Copy, Check, Music2, Share2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
 const navItems = [
   { to: '/', icon: Home, label: 'Início', end: true },
@@ -14,12 +15,29 @@ const navItems = [
 ]
 
 export default function Layout() {
-  const { signOut, couple, user } = useAuth()
+  const { signOut, couple, setCouple, user } = useAuth()
   const navigate = useNavigate()
   const [copied, setCopied] = useState(false)
+  const [inviteCode, setInviteCode] = useState(couple?.invite_code || '')
+  const [showCode, setShowCode] = useState(false)
+
+  // Busca o código diretamente do banco como fallback garantido
+  useEffect(() => {
+    if (couple?.invite_code) { setInviteCode(couple.invite_code); return }
+    if (!user) return
+    async function loadCode() {
+      const { data: member } = await supabase
+        .from('couple_members').select('couple_id').eq('user_id', user.id).maybeSingle()
+      if (!member?.couple_id) return
+      const { data: c } = await supabase
+        .from('couples').select('id, name, created_at, invite_code').eq('id', member.couple_id).maybeSingle()
+      if (c) { setInviteCode(c.invite_code); setCouple(c) }
+    }
+    loadCode()
+  }, [user, couple])
 
   function copyCode() {
-    navigator.clipboard.writeText(couple?.invite_code || '')
+    navigator.clipboard.writeText(inviteCode || '')
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -46,13 +64,14 @@ export default function Layout() {
             <span className="font-black gradient-text text-lg tracking-tight">{couple?.name || 'J&T Moments'}</span>
           </div>
           <div className="flex items-center gap-2">
-            {couple?.invite_code && (
+            {inviteCode && (
               <button
-                onClick={copyCode}
+                onClick={() => { copyCode(); setShowCode(true); setTimeout(() => setShowCode(false), 3000) }}
                 title="Copiar código de convite"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-pink-500/15 hover:border-pink-500/40 hover:bg-pink-500/5 transition-all"
               >
-                <span className="font-mono text-xs font-bold text-pink-400/60">{couple.invite_code}</span>
+                <Share2 className="w-3 h-3 text-pink-400/60" />
+                <span className="font-mono text-xs font-bold text-pink-400/80">{inviteCode}</span>
                 {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-white/20" />}
               </button>
             )}
@@ -140,7 +159,7 @@ export default function Layout() {
           </div>
 
           {/* Código de convite — sidebar */}
-          {couple?.invite_code && (
+          {inviteCode && (
             <div className="mb-3 px-1">
               <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1.5 px-3">Código de convite</p>
               <button
@@ -148,7 +167,7 @@ export default function Layout() {
                 className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border border-pink-500/10 hover:border-pink-500/30 hover:bg-pink-500/5 transition-all group"
               >
                 <span className="font-mono font-black text-pink-400/70 tracking-[0.25em] text-sm group-hover:text-pink-400">
-                  {couple.invite_code}
+                  {inviteCode}
                 </span>
                 {copied
                   ? <Check className="w-3.5 h-3.5 text-emerald-400" />
