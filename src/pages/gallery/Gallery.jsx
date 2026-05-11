@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
-import { Upload, Image, X, Loader2, Heart, ZoomIn, Plus, FolderOpen, ArrowLeft, Trash2, Pencil, Check } from 'lucide-react'
+import { Upload, Image, X, Loader2, Heart, ZoomIn, Plus, FolderOpen, ArrowLeft, Trash2, Pencil, Check, Calendar } from 'lucide-react'
 
 export default function Gallery() {
   const { couple } = useAuth()
@@ -14,9 +14,12 @@ export default function Gallery() {
   const [selected, setSelected] = useState(null)
   const [albumModal, setAlbumModal] = useState(false)
   const [albumName, setAlbumName] = useState('')
+  const [albumDate, setAlbumDate] = useState('')
   const [savingAlbum, setSavingAlbum] = useState(false)
   const [editingTitle, setEditingTitle] = useState(false)
   const [editTitle, setEditTitle] = useState('')
+  const [editingDate, setEditingDate] = useState(false)
+  const [editDate, setEditDate] = useState('')
   const inputRef = useRef()
   const titleInputRef = useRef()
 
@@ -63,11 +66,12 @@ export default function Gallery() {
     setSavingAlbum(true)
     const { data } = await supabase
       .from('albums')
-      .insert({ couple_id: couple.id, name: albumName })
+      .insert({ couple_id: couple.id, name: albumName, album_date: albumDate || null })
       .select()
       .single()
     setSavingAlbum(false)
     setAlbumName('')
+    setAlbumDate('')
     setAlbumModal(false)
     await fetchAlbums()
     if (data) openAlbum(data)
@@ -83,6 +87,18 @@ export default function Gallery() {
     await supabase.from('albums').update({ name: editTitle }).eq('id', currentAlbum.id)
     setCurrentAlbum(a => ({ ...a, name: editTitle }))
     setEditingTitle(false)
+  }
+
+  async function handleSaveDate() {
+    await supabase.from('albums').update({ album_date: editDate || null }).eq('id', currentAlbum.id)
+    setCurrentAlbum(a => ({ ...a, album_date: editDate || null }))
+    setEditingDate(false)
+  }
+
+  function formatDate(d) {
+    if (!d) return null
+    const [y, m, day] = d.split('-')
+    return `${day}/${m}/${y}`
   }
 
   function startEditTitle() {
@@ -190,9 +206,12 @@ export default function Gallery() {
                     : <FolderOpen className="w-10 h-10 text-pink-400/40 group-hover:text-pink-400/70 transition-all" />
                   }
                 </div>
-                <div className="p-4">
-                  <p className="font-bold text-white text-sm truncate">{album.name}</p>
-                  <p className="text-white/30 text-xs mt-0.5">{album.gallery?.[0]?.count ?? 0} fotos</p>
+                <div className="p-3">
+                  <p className="font-bold text-white text-sm leading-snug" style={{display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden'}}>{album.name}</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-white/30 text-xs">{album.gallery?.[0]?.count ?? 0} fotos</p>
+                    {album.album_date && <p className="text-pink-400/60 text-xs">{formatDate(album.album_date)}</p>}
+                  </div>
                 </div>
                 <button
                   onClick={e => { e.stopPropagation(); handleDeleteAlbum(album) }}
@@ -215,15 +234,29 @@ export default function Gallery() {
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <input
-                type="text"
-                value={albumName}
-                onChange={e => setAlbumName(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleCreateAlbum()}
-                className="input-cyber w-full rounded-xl text-sm"
-                placeholder='Ex: "Viagem para SP", "Aniversário"...'
-                autoFocus
-              />
+              <div style={{display:'flex', flexDirection:'column', gap:'1rem'}}>
+                <div>
+                  <label className="block text-xs font-semibold text-white/50 uppercase tracking-widest mb-2">Nome do álbum</label>
+                  <input
+                    type="text"
+                    value={albumName}
+                    onChange={e => setAlbumName(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleCreateAlbum()}
+                    className="input-cyber w-full rounded-xl text-sm"
+                    placeholder='Ex: "Viagem para SP", "Aniversário"...'
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-white/50 uppercase tracking-widest mb-2">Data <span className="normal-case text-white/25 font-normal">(opcional)</span></label>
+                  <input
+                    type="date"
+                    value={albumDate}
+                    onChange={e => setAlbumDate(e.target.value)}
+                    className="input-cyber w-full rounded-xl text-sm"
+                  />
+                </div>
+              </div>
               <div style={{marginTop: "2rem"}} className="flex gap-3">
                 <button onClick={() => setAlbumModal(false)} className="flex-1 py-3 rounded-2xl text-sm font-semibold text-white/40 hover:text-white hover:bg-white/5 transition border border-white/10">
                   Cancelar
@@ -242,45 +275,15 @@ export default function Gallery() {
   // ── TELA DE FOTOS DO ÁLBUM ──────────────────────────────
   return (
     <div className="max-w-2xl mx-auto py-8 px-6">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <button onClick={goBack} className="p-2 text-white/40 hover:text-white transition rounded-xl hover:bg-white/5 flex-shrink-0">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div className="flex-1 min-w-0">
-            {editingTitle ? (
-              <div className="flex items-center gap-2">
-                <input
-                  ref={titleInputRef}
-                  type="text"
-                  value={editTitle}
-                  onChange={e => setEditTitle(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') handleRenameAlbum(); if (e.key === 'Escape') setEditingTitle(false) }}
-                  className="input-cyber rounded-xl text-lg font-black w-full"
-                  style={{padding: '4px 10px'}}
-                />
-                <button onClick={handleRenameAlbum} className="p-1.5 rounded-lg bg-pink-500/20 text-pink-400 hover:bg-pink-500/30 transition flex-shrink-0">
-                  <Check className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 group/title">
-                <h1 className="text-2xl font-black gradient-text truncate">{currentAlbum.name}</h1>
-                <button
-                  onClick={startEditTitle}
-                  className="p-1 rounded-lg text-white/30 hover:text-pink-400 hover:bg-pink-500/10 transition flex-shrink-0"
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            )}
-            <p className="text-white/30 text-sm mt-0.5">{photos.length} {photos.length === 1 ? 'foto' : 'fotos'}</p>
-          </div>
-        </div>
+      {/* Header: voltar + botão adicionar */}
+      <div className="flex items-center justify-between mb-3">
+        <button onClick={goBack} className="p-2 text-white/40 hover:text-white transition rounded-xl hover:bg-white/5">
+          <ArrowLeft className="w-5 h-5" />
+        </button>
         <button
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="btn-neon flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap ml-3"
+          className="btn-neon flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap"
         >
           {uploading
             ? <><Loader2 className="w-4 h-4 animate-spin" /> {uploadProgress.done}/{uploadProgress.total}</>
@@ -288,6 +291,61 @@ export default function Gallery() {
           }
         </button>
         <input ref={inputRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={handleUpload} />
+      </div>
+
+      {/* Título + data + contagem */}
+      <div className="mb-6">
+        {editingTitle ? (
+          <div className="flex items-center gap-2 mb-1">
+            <input
+              ref={titleInputRef}
+              type="text"
+              value={editTitle}
+              onChange={e => setEditTitle(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleRenameAlbum(); if (e.key === 'Escape') setEditingTitle(false) }}
+              className="input-cyber rounded-xl font-black w-full"
+              style={{padding: '6px 12px', fontSize: '1.4rem'}}
+            />
+            <button onClick={handleRenameAlbum} className="p-1.5 rounded-lg bg-pink-500/20 text-pink-400 hover:bg-pink-500/30 transition flex-shrink-0">
+              <Check className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-start gap-2">
+            <h1 className="text-2xl font-black gradient-text leading-tight">{currentAlbum.name}</h1>
+            <button onClick={startEditTitle} className="mt-1 p-1 rounded-lg text-white/30 hover:text-pink-400 hover:bg-pink-500/10 transition flex-shrink-0">
+              <Pencil className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
+        <div className="flex items-center gap-3 mt-1">
+          <p className="text-white/30 text-sm">{photos.length} {photos.length === 1 ? 'foto' : 'fotos'}</p>
+          {editingDate ? (
+            <div className="flex items-center gap-1.5">
+              <input
+                type="date"
+                value={editDate}
+                onChange={e => setEditDate(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleSaveDate(); if (e.key === 'Escape') setEditingDate(false) }}
+                className="input-cyber rounded-lg text-xs"
+                style={{padding: '2px 8px'}}
+                autoFocus
+              />
+              <button onClick={handleSaveDate} className="p-1 rounded-lg bg-pink-500/20 text-pink-400 transition flex-shrink-0">
+                <Check className="w-3 h-3" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => { setEditDate(currentAlbum.album_date || ''); setEditingDate(true) }}
+              className="flex items-center gap-1 text-xs text-pink-400/60 hover:text-pink-400 transition"
+            >
+              <Calendar className="w-3 h-3" />
+              {currentAlbum.album_date ? formatDate(currentAlbum.album_date) : 'Adicionar data'}
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (
