@@ -15,7 +15,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' })
+  const [loginForm, setLoginForm] = useState({ email: '', password: '', code: '' })
   const [registerForm, setRegisterForm] = useState({ name: '', email: '', password: '', coupleName: '' })
   const [inviteForm, setInviteForm] = useState({ name: '', email: '', password: '', code: '' })
 
@@ -24,7 +24,28 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      await signIn(loginForm.email, loginForm.password)
+      const { data: loginData } = await signIn(loginForm.email, loginForm.password)
+      const userId = loginData?.user?.id
+
+      // Se informou código de convite, tenta entrar no espaço
+      if (loginForm.code.trim() && userId) {
+        const { data: coupleData } = await supabase
+          .from('couples')
+          .select('id, name, created_at, invite_code')
+          .eq('invite_code', loginForm.code.toUpperCase().trim())
+          .maybeSingle()
+        if (coupleData) {
+          const { data: existing } = await supabase
+            .from('couple_members').select('id').eq('user_id', userId).limit(1)
+          if (!existing?.length) {
+            await supabase.from('couple_members').insert({ couple_id: coupleData.id, user_id: userId })
+          }
+          setCouple(coupleData)
+        } else {
+          setError('Código de convite inválido — mas você foi logado.')
+        }
+      }
+
       navigate('/', { replace: true })
     } catch {
       setError('Email ou senha incorretos.')
@@ -177,6 +198,10 @@ export default function Login() {
               <div>
                 <label className="block text-xs font-semibold text-white/50 uppercase tracking-widest mb-2">Senha</label>
                 <input type="password" required value={loginForm.password} onChange={e => setLoginForm(f=>({...f,password:e.target.value}))} className="input-cyber w-full rounded-xl text-sm" placeholder="••••••••" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-white/50 uppercase tracking-widest mb-2">Código de convite <span className="normal-case text-white/25 font-normal">(opcional)</span></label>
+                <input type="text" value={loginForm.code} onChange={e => setLoginForm(f=>({...f,code:e.target.value}))} className="input-cyber w-full rounded-xl text-sm text-center font-mono tracking-widest uppercase" placeholder="ABC123" maxLength={6} />
               </div>
               {error && <div className="rounded-xl px-4 py-3 text-sm text-pink-400 border border-pink-500/30 bg-pink-500/10">{error}</div>}
               <button type="submit" disabled={loading} className="btn-neon w-full py-3.5 rounded-xl text-sm" style={{marginTop:'0.5rem'}}>
