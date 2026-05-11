@@ -25,7 +25,21 @@ export default function Gallery() {
       .select('*, gallery(count)')
       .eq('couple_id', couple.id)
       .order('created_at', { ascending: false })
-    setAlbums(data || [])
+
+    if (data?.length) {
+      const ids = data.map(a => a.id)
+      const { data: covers } = await supabase
+        .from('gallery')
+        .select('album_id, url')
+        .in('album_id', ids)
+        .order('created_at', { ascending: false })
+
+      const coverMap = {}
+      covers?.forEach(c => { if (!coverMap[c.album_id]) coverMap[c.album_id] = c.url })
+      setAlbums(data.map(a => ({ ...a, coverUrl: coverMap[a.id] || null })))
+    } else {
+      setAlbums(data || [])
+    }
     setLoading(false)
   }
 
@@ -151,9 +165,12 @@ export default function Gallery() {
                 className="group relative glass rounded-2xl border border-white/5 overflow-hidden cursor-pointer hover:border-pink-500/30 transition-all hover:scale-[1.02]"
                 onClick={() => openAlbum(album)}
               >
-                {/* Cover — placeholder ou futura capa */}
-                <div className="h-32 bg-gradient-to-br from-pink-500/10 to-purple-500/10 flex items-center justify-center">
-                  <FolderOpen className="w-10 h-10 text-pink-400/40 group-hover:text-pink-400/70 transition-all" />
+                {/* Capa do álbum */}
+                <div className="h-32 bg-gradient-to-br from-pink-500/10 to-purple-500/10 relative overflow-hidden flex items-center justify-center">
+                  {album.coverUrl
+                    ? <img src={album.coverUrl} alt={album.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    : <FolderOpen className="w-10 h-10 text-pink-400/40 group-hover:text-pink-400/70 transition-all" />
+                  }
                 </div>
                 <div className="p-4">
                   <p className="font-bold text-white text-sm truncate">{album.name}</p>
