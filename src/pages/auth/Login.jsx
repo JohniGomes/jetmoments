@@ -97,21 +97,32 @@ export default function Login() {
         .maybeSingle()
       if (coupleErr || !coupleData) { setError('Código de convite inválido.'); setLoading(false); return }
 
-      // Tenta criar conta; se email já existe, faz login
+      // Tenta criar conta nova
       let userId = null
+      let signUpErr = null
       try {
         const { data: authData } = await signUp(inviteForm.email, inviteForm.password, inviteForm.name)
         userId = authData?.user?.id
-      } catch {
-        // Email já cadastrado — tenta login
+      } catch (e) {
+        signUpErr = e?.message || ''
+      }
+
+      // Se o cadastro falhou, tenta login (email já existe)
+      if (!userId) {
+        try {
+          const { data: loginData } = await signIn(inviteForm.email, inviteForm.password)
+          userId = loginData?.user?.id
+        } catch {
+          // login também falhou
+        }
       }
 
       if (!userId) {
-        const { data: loginData } = await signIn(inviteForm.email, inviteForm.password)
-        userId = loginData?.user?.id
+        if (signUpErr?.includes('20 seconds') || signUpErr?.includes('security purposes')) {
+          throw new Error('Aguarde alguns segundos e tente novamente.')
+        }
+        throw new Error('Não foi possível entrar. Se já tem conta, use a aba "Entrar" com o código de convite.')
       }
-
-      if (!userId) throw new Error('Não foi possível autenticar. Verifique o email e a senha.')
 
       // Adiciona ao casal se ainda não for membro
       const { data: existing } = await supabase
