@@ -164,7 +164,7 @@ export default function Gallery() {
                 {/* Botão deletar */}
                 <button
                   onClick={e => { e.stopPropagation(); handleDeleteAlbum(album) }}
-                  className="absolute top-2 right-2 p-1.5 rounded-xl bg-black/40 text-white/30 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                  className="absolute top-2 right-2 p-1.5 rounded-xl bg-black/50 text-white/40 hover:text-red-400 hover:bg-red-500/20 transition-all"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
