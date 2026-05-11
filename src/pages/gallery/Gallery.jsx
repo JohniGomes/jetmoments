@@ -41,7 +41,7 @@ export default function Gallery() {
   }
 
   async function handleCreateAlbum() {
-    if (!albumName.trim()) return
+    if (!albumName.trim() || !couple?.id) return
     setSavingAlbum(true)
     const { data } = await supabase
       .from('albums')

@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { Heart, Image, BookOpen, MapPin, Star, List, LogOut, Home, Copy, Check, Music2, Share2 } from 'lucide-react'
+import { Heart, Image, BookOpen, MapPin, Star, List, LogOut, Home, Copy, Check, Music2, Share2, Link2, Loader2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
@@ -15,11 +15,14 @@ const navItems = [
 ]
 
 export default function Layout() {
-  const { signOut, couple, setCouple, user } = useAuth()
+  const { signOut, couple, setCouple, user, fetchCouple } = useAuth()
   const navigate = useNavigate()
   const [copied, setCopied] = useState(false)
   const [inviteCode, setInviteCode] = useState(couple?.invite_code || '')
   const [showCode, setShowCode] = useState(false)
+  const [connectCode, setConnectCode] = useState('')
+  const [connectError, setConnectError] = useState('')
+  const [connectLoading, setConnectLoading] = useState(false)
 
   // Busca o código diretamente do banco como fallback garantido
   useEffect(() => {
@@ -48,8 +51,69 @@ export default function Layout() {
     navigate('/login')
   }
 
+  async function handleConnect(e) {
+    e.preventDefault()
+    if (!connectCode.trim()) return
+    setConnectLoading(true)
+    setConnectError('')
+    try {
+      const { data: coupleData } = await supabase
+        .from('couples')
+        .select('id, name, created_at, invite_code')
+        .eq('invite_code', connectCode.toUpperCase().trim())
+        .maybeSingle()
+      if (!coupleData) { setConnectError('Código inválido.'); setConnectLoading(false); return }
+
+      const { data: existing } = await supabase
+        .from('couple_members').select('id').eq('user_id', user.id).limit(1)
+      if (!existing?.length) {
+        await supabase.from('couple_members').insert({ couple_id: coupleData.id, user_id: user.id })
+      }
+      setCouple(coupleData)
+      setInviteCode(coupleData.invite_code)
+      setConnectCode('')
+    } catch {
+      setConnectError('Erro ao conectar. Tente novamente.')
+    } finally {
+      setConnectLoading(false)
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-[#07060f]">
+      {/* Overlay: usuário sem casal vinculado */}
+      {!couple && user && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-6">
+          <div style={{background:'rgba(255,255,255,0.05)', backdropFilter:'blur(24px)', border:'1px solid rgba(247,37,133,0.15)', borderRadius:'24px', padding:'2rem 1.5rem', width:'100%', maxWidth:'360px'}}>
+            <div style={{textAlign:'center', marginBottom:'1.5rem'}}>
+              <div style={{width:'56px', height:'56px', borderRadius:'16px', background:'linear-gradient(135deg,#f72585,#7209b7)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1rem'}}>
+                <Link2 style={{width:'24px', height:'24px', color:'white'}} />
+              </div>
+              <h2 style={{fontSize:'1.2rem', fontWeight:900, background:'linear-gradient(135deg,#f72585,#b5179e)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent'}}>Conectar ao espaço</h2>
+              <p style={{color:'rgba(255,255,255,0.4)', fontSize:'0.8rem', marginTop:'4px'}}>Peça o código de convite ao seu parceiro(a)</p>
+            </div>
+            <form onSubmit={handleConnect} style={{display:'flex', flexDirection:'column', gap:'1rem'}}>
+              <input
+                type="text"
+                value={connectCode}
+                onChange={e => setConnectCode(e.target.value)}
+                className="input-cyber w-full rounded-xl text-sm text-center font-mono tracking-widest uppercase"
+                placeholder="ABC123"
+                maxLength={6}
+                autoFocus
+              />
+              {connectError && <p style={{color:'#f72585', fontSize:'0.78rem', textAlign:'center'}}>{connectError}</p>}
+              <button type="submit" disabled={connectLoading} className="btn-neon w-full py-3 rounded-xl text-sm font-bold">
+                {connectLoading ? <Loader2 style={{width:'16px', height:'16px', animation:'spin 1s linear infinite', margin:'0 auto'}} /> : 'Entrar no espaço ♡'}
+              </button>
+            </form>
+            <button onClick={handleSignOut} style={{width:'100%', marginTop:'0.75rem', padding:'10px', background:'transparent', border:'none', color:'rgba(255,255,255,0.25)', fontSize:'0.75rem', cursor:'pointer'}}>
+              Sair da conta
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Orbs globais */}
       <div className="orb w-[500px] h-[500px] bg-pink-700/10 -top-40 -right-40 fixed" />
       <div className="orb w-[400px] h-[400px] bg-purple-800/10 bottom-0 -left-20 fixed" />
