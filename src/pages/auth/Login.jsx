@@ -68,6 +68,7 @@ export default function Login() {
     if (inviteForm.password.length < 6) return setError('Senha mínima de 6 caracteres.')
     setLoading(true)
     try {
+      // Valida o código de convite
       const { data: coupleData, error: coupleErr } = await supabase
         .from('couples')
         .select('id, name, created_at, invite_code')
@@ -75,20 +76,37 @@ export default function Login() {
         .maybeSingle()
       if (coupleErr || !coupleData) { setError('Código de convite inválido.'); setLoading(false); return }
 
-      const { data: authData } = await signUp(inviteForm.email, inviteForm.password, inviteForm.name)
-      const userId = authData?.user?.id
-      if (!userId) throw new Error('Erro ao criar conta.')
+      // Tenta criar conta; se email já existe, faz login
+      let userId = null
+      try {
+        const { data: authData } = await signUp(inviteForm.email, inviteForm.password, inviteForm.name)
+        userId = authData?.user?.id
+      } catch {
+        // Email já cadastrado — tenta login
+      }
 
-      await supabase.from('couple_members').insert({ couple_id: coupleData.id, user_id: userId })
+      if (!userId) {
+        const { data: loginData } = await signIn(inviteForm.email, inviteForm.password)
+        userId = loginData?.user?.id
+      }
+
+      if (!userId) throw new Error('Não foi possível autenticar. Verifique o email e a senha.')
+
+      // Adiciona ao casal se ainda não for membro
+      const { data: existing } = await supabase
+        .from('couple_members').select('id').eq('user_id', userId).limit(1)
+      if (!existing?.length) {
+        await supabase.from('couple_members').insert({ couple_id: coupleData.id, user_id: userId })
+      }
 
       setCouple(coupleData)
       navigate('/', { replace: true })
     } catch (err) {
       const msg = err.message || ''
-      if (msg.includes('20 seconds') || msg.includes('rate') || msg.includes('security purposes')) {
+      if (msg.includes('20 seconds') || msg.includes('security purposes')) {
         setError('Aguarde alguns segundos e tente novamente.')
-      } else if (msg.includes('already registered') || msg.includes('already been registered')) {
-        setError('Este email já possui uma conta. Use a aba Entrar.')
+      } else if (msg.includes('Invalid login') || msg.includes('credentials')) {
+        setError('Senha incorreta para este email.')
       } else {
         setError(msg || 'Erro ao entrar com convite.')
       }
