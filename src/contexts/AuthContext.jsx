@@ -34,21 +34,27 @@ export function AuthProvider({ children }) {
   }, [])
 
   async function fetchCouple(userId) {
-    // Se já tem cache, remove o loading imediatamente
     const cached = getCachedCouple()
-    if (cached) setLoading(false)
+    if (cached) {
+      setCouple(cached)
+      setLoading(false)
+    }
 
     try {
-      const { data: members } = await supabase
+      const { data: members, error: membersErr } = await supabase
         .from('couple_members')
         .select('couple_id')
         .eq('user_id', userId)
         .limit(1)
+
+      // Se a query falhou (RLS ou rede), mantém o cache — não limpa
+      if (membersErr) { setLoading(false); return }
+
       const member = members?.[0]
 
+      // Sem row: só limpa se não tinha cache (usuário realmente sem casal)
       if (!member?.couple_id) {
-        setCachedCouple(null)
-        setCouple(null)
+        if (!cached) { setCachedCouple(null); setCouple(null) }
         setLoading(false)
         return
       }
