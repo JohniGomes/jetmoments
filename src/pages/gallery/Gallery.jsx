@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
-import { Upload, Image, X, Loader2, Heart, ZoomIn, Plus, FolderOpen, ArrowLeft, Trash2 } from 'lucide-react'
+import { Upload, Image, X, Loader2, Heart, ZoomIn, Plus, FolderOpen, ArrowLeft, Trash2, Pencil, Check } from 'lucide-react'
 
 export default function Gallery() {
   const { couple } = useAuth()
@@ -10,11 +10,15 @@ export default function Gallery() {
   const [photos, setPhotos] = useState([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 })
   const [selected, setSelected] = useState(null)
   const [albumModal, setAlbumModal] = useState(false)
   const [albumName, setAlbumName] = useState('')
   const [savingAlbum, setSavingAlbum] = useState(false)
+  const [editingTitle, setEditingTitle] = useState(false)
+  const [editTitle, setEditTitle] = useState('')
   const inputRef = useRef()
+  const titleInputRef = useRef()
 
   useEffect(() => { if (couple) fetchAlbums(); else setLoading(false) }, [couple])
 
@@ -74,6 +78,19 @@ export default function Gallery() {
     await fetchAlbums()
   }
 
+  async function handleRenameAlbum() {
+    if (!editTitle.trim() || editTitle === currentAlbum.name) { setEditingTitle(false); return }
+    await supabase.from('albums').update({ name: editTitle }).eq('id', currentAlbum.id)
+    setCurrentAlbum(a => ({ ...a, name: editTitle }))
+    setEditingTitle(false)
+  }
+
+  function startEditTitle() {
+    setEditTitle(currentAlbum.name)
+    setEditingTitle(true)
+    setTimeout(() => titleInputRef.current?.focus(), 50)
+  }
+
   function openAlbum(album) {
     setCurrentAlbum(album)
     fetchPhotos(album.id)
@@ -89,8 +106,10 @@ export default function Gallery() {
     const files = Array.from(e.target.files)
     if (!files.length || !currentAlbum) return
     setUploading(true)
+    setUploadProgress({ done: 0, total: files.length })
 
-    for (const file of files) {
+    // Upload em paralelo — todas as fotos ao mesmo tempo
+    await Promise.all(files.map(async (file) => {
       const ext = file.name.split('.').pop()
       const path = `${couple.id}/${currentAlbum.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
@@ -108,10 +127,13 @@ export default function Gallery() {
           name: file.name,
         })
       }
-    }
+
+      setUploadProgress(p => ({ ...p, done: p.done + 1 }))
+    }))
 
     await fetchPhotos(currentAlbum.id)
     setUploading(false)
+    setUploadProgress({ done: 0, total: 0 })
     inputRef.current.value = ''
   }
 
@@ -131,10 +153,7 @@ export default function Gallery() {
             <h1 className="text-2xl font-black gradient-text">Galeria</h1>
             <p className="text-white/30 text-sm mt-1">{albums.length} {albums.length === 1 ? 'álbum' : 'álbuns'}</p>
           </div>
-          <button
-            onClick={() => setAlbumModal(true)}
-            className="btn-header"
-          >
+          <button onClick={() => setAlbumModal(true)} className="btn-header">
             <Plus className="w-4 h-4" /> Novo álbum
           </button>
         </div>
@@ -165,7 +184,6 @@ export default function Gallery() {
                 className="group relative glass rounded-2xl border border-white/5 overflow-hidden cursor-pointer hover:border-pink-500/30 transition-all hover:scale-[1.02]"
                 onClick={() => openAlbum(album)}
               >
-                {/* Capa do álbum */}
                 <div className="h-32 bg-gradient-to-br from-pink-500/10 to-purple-500/10 relative overflow-hidden flex items-center justify-center">
                   {album.coverUrl
                     ? <img src={album.coverUrl} alt={album.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
@@ -174,11 +192,8 @@ export default function Gallery() {
                 </div>
                 <div className="p-4">
                   <p className="font-bold text-white text-sm truncate">{album.name}</p>
-                  <p className="text-white/30 text-xs mt-0.5">
-                    {album.gallery?.[0]?.count ?? 0} fotos
-                  </p>
+                  <p className="text-white/30 text-xs mt-0.5">{album.gallery?.[0]?.count ?? 0} fotos</p>
                 </div>
-                {/* Botão deletar */}
                 <button
                   onClick={e => { e.stopPropagation(); handleDeleteAlbum(album) }}
                   className="absolute top-2 right-2 p-1.5 rounded-xl bg-black/50 text-white/40 hover:text-red-400 hover:bg-red-500/20 transition-all"
@@ -228,25 +243,49 @@ export default function Gallery() {
   return (
     <div className="max-w-2xl mx-auto py-8 px-6">
       <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={goBack}
-            className="p-2 text-white/40 hover:text-white transition rounded-xl hover:bg-white/5"
-          >
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <button onClick={goBack} className="p-2 text-white/40 hover:text-white transition rounded-xl hover:bg-white/5 flex-shrink-0">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div>
-            <h1 className="text-2xl font-black gradient-text">{currentAlbum.name}</h1>
+          <div className="flex-1 min-w-0">
+            {editingTitle ? (
+              <div className="flex items-center gap-2">
+                <input
+                  ref={titleInputRef}
+                  type="text"
+                  value={editTitle}
+                  onChange={e => setEditTitle(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleRenameAlbum(); if (e.key === 'Escape') setEditingTitle(false) }}
+                  className="input-cyber rounded-xl text-lg font-black w-full"
+                  style={{padding: '4px 10px'}}
+                />
+                <button onClick={handleRenameAlbum} className="p-1.5 rounded-lg bg-pink-500/20 text-pink-400 hover:bg-pink-500/30 transition flex-shrink-0">
+                  <Check className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 group/title">
+                <h1 className="text-2xl font-black gradient-text truncate">{currentAlbum.name}</h1>
+                <button
+                  onClick={startEditTitle}
+                  className="p-1 rounded-lg text-white/30 hover:text-pink-400 hover:bg-pink-500/10 transition flex-shrink-0"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
             <p className="text-white/30 text-sm mt-0.5">{photos.length} {photos.length === 1 ? 'foto' : 'fotos'}</p>
           </div>
         </div>
         <button
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="btn-neon flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap"
+          className="btn-neon flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap ml-3"
         >
-          {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-          {uploading ? 'Enviando...' : 'Adicionar'}
+          {uploading
+            ? <><Loader2 className="w-4 h-4 animate-spin" /> {uploadProgress.done}/{uploadProgress.total}</>
+            : <><Upload className="w-4 h-4" /> Adicionar</>
+          }
         </button>
         <input ref={inputRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={handleUpload} />
       </div>
