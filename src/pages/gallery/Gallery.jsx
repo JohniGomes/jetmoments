@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
-import { Upload, Image, X, Loader2, Heart, ZoomIn, Plus, FolderOpen, ArrowLeft, Trash2, Pencil, Check, Calendar } from 'lucide-react'
+import { Upload, Image, X, Loader2, Heart, ZoomIn, Plus, FolderOpen, ArrowLeft, Trash2, Pencil, Check, Calendar, Play } from 'lucide-react'
+
+function isVideo(url = '') {
+  return /\.(mp4|mov|avi|webm|mkv|m4v|3gp)(\?|$)/i.test(url)
+}
 
 export default function Gallery() {
   const { couple } = useAuth()
@@ -371,13 +375,23 @@ export default function Gallery() {
           {photos.map(photo => (
             <div
               key={photo.id}
-              className="group relative rounded-2xl overflow-hidden cursor-pointer aspect-square"
+              className="group relative rounded-2xl overflow-hidden cursor-pointer aspect-square bg-black"
               onClick={() => setSelected(photo)}
             >
-              <img src={photo.url} alt={photo.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              {isVideo(photo.url)
+                ? <>
+                    <video src={photo.url} className="w-full h-full object-cover" muted playsInline preload="metadata" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
+                        <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+                      </div>
+                    </div>
+                  </>
+                : <img src={photo.url} alt={photo.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              }
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <ZoomIn className="w-5 h-5 text-white" />
+                {isVideo(photo.url) ? <Play className="w-5 h-5 text-white fill-white" /> : <ZoomIn className="w-5 h-5 text-white" />}
               </div>
             </div>
           ))}
@@ -388,7 +402,10 @@ export default function Gallery() {
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4" onClick={() => setSelected(null)}>
           <div className="relative max-w-2xl w-full" onClick={e => e.stopPropagation()}>
-            <img src={selected.url} alt={selected.name} className="w-full rounded-3xl object-contain max-h-[80vh]" />
+            {isVideo(selected.url)
+              ? <video src={selected.url} controls autoPlay playsInline className="w-full rounded-3xl max-h-[80vh]" style={{background:'#000'}} />
+              : <img src={selected.url} alt={selected.name} className="w-full rounded-3xl object-contain max-h-[80vh]" />
+            }
             <div className="absolute top-3 right-3 flex gap-2">
               <button onClick={() => handleDeletePhoto(selected)} className="p-2 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 transition">
                 <Trash2 className="w-4 h-4" />
